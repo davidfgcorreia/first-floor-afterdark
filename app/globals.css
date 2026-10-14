@@ -1,0 +1,179 @@
+@import "tailwindcss";
+
+/* Brand tokens. The logo is pure black/white; magenta (the venue's lighting)
+   is the single accent, used for CTAs, hovers and the menu overlay. */
+:root {
+  --ink: #0a0a0a;
+  --ink-2: #141414;
+  --paper: #f4f2ee;
+  --muted: #8a8a8a;
+  --line: rgb(255 255 255 / 0.14);
+  --accent: #e5007e;
+  --accent-ink: #ffffff;
+  --header-h: 64px;
+}
+@media (min-width: 768px) {
+  :root {
+    --header-h: 80px;
+  }
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-paper: var(--paper);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-michroma);
+  --font-condensed: var(--font-anton);
+}
+
+html {
+  background: var(--ink);
+  color: var(--paper);
+  -webkit-font-smoothing: antialiased;
+}
+body {
+  font-family: var(--font-body), system-ui, sans-serif;
+  background: var(--ink);
+  overflow-x: clip;
+}
+::selection {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+/* Native anchor jumps (touch devices scroll without Lenis) land below the fixed header. */
+html {
+  scroll-padding-top: var(--header-h);
+}
+
+/* Lenis */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+
+/* Components live in a layer so Tailwind utilities can override them. */
+@layer components {
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  padding: 0.95em 1.6em;
+  font-weight: 600;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1;
+  transition:
+    background-color 0.25s,
+    color 0.25s,
+    border-color 0.25s;
+  white-space: nowrap;
+}
+.btn-accent {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+@media (hover: hover) {
+  .btn-accent:hover {
+    background: var(--paper);
+    color: var(--ink);
+  }
+}
+.btn-ghost {
+  border: 1.5px solid currentColor;
+}
+@media (hover: hover) {
+  .btn-ghost:hover {
+    background: var(--paper);
+    color: var(--ink);
+    border-color: var(--paper);
+  }
+}
+.btn-dark {
+  background: var(--ink);
+  color: var(--paper);
+}
+@media (hover: hover) {
+  .btn-dark:hover {
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+}
+
+.kicker {
+  font-family: var(--font-michroma), sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+}
+
+/* Stroke colour must not be currentColor: the fill (color) is transparent. */
+.outline-text {
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--paper);
+}
+.outline-text.on-light {
+  -webkit-text-stroke-color: var(--ink);
+}
+
+/* Set by Motion.tsx on [data-spin] elements that are off-screen. */
+[data-offscreen] {
+  animation-play-state: paused !important; /* beats the animate-[…] shorthand in the utilities layer */
+}
+
+/* Full screen minus the always-visible header. */
+.h-view {
+  height: calc(100svh - var(--header-h));
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Hero logo starts un-built in CSS so the server-rendered page doesn't flash the
+   finished logo before Hero.tsx's timeline takes over (GSAP's inline styles win). */
+@media (prefers-reduced-motion: no-preference) {
+  [data-hero] [data-ring] {
+    stroke-dashoffset: 1;
+  }
+  [data-hero] [data-dot],
+  [data-hero] [data-club],
+  [data-hero] [data-late] {
+    opacity: 0;
+  }
+  [data-hero] [data-word] {
+    clip-path: inset(0 100% 0 0);
+  }
+}
